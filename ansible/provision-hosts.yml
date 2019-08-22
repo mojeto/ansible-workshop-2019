@@ -221,3 +221,16 @@
       with_items: "{{ groups.db }}"
 
 # ADD locale and timezone
+- name: Set locale and local timezone
+  hosts: cluster
+  become: true
+  tasks:
+
+    - name: Add NZ locale to all instances
+      locale_gen:
+        name: en_NZ.UTF-8
+        state: present
+
+    - name: Set local timezone
+      timezone:
+        name: Pacific/Auckland
