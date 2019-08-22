@@ -198,14 +198,15 @@
       with_items: "{{ groups.private_net }}"
 
 # ADD web -> app for proxy pass
+- name: Set up web hosts with mapping to backend
+  hosts: web
+  become: true
+  tasks:
 
-
-
-
-
-
-
-
+    - name: Map each frontend host to speak to a specific backend
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[groups.app[(group_index | int) - 1]].ansible_host }} backend"
 
 # ADD app -> db for application
 
