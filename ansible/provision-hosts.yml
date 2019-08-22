@@ -21,13 +21,37 @@
         var: host_set | mandatory
 
     # ADD create cloud resource methods
+    - name: Connect to Catalyst Cloud
+      os_auth:
 
+    - name: Create keypair
+      os_keypair:
+        name: "{{ keypair_name }}"
+        public_key: "{{ ssh_public_key }}"
 
+    - name: Create network
+      os_network:
+        name: "{{ network_name }}"
+        state: present
 
+    - name: Create subnet
+      os_subnet:
+        name: "{{ subnet_name }}"
+        network_name: "{{ network_name }}"
+        state: present
+        cidr: "{{ subnet_cidr }}"
+        allocation_pool_start: "{{ subnet_dhcp_start }}"
+        allocation_pool_end: "{{ subnet_dhcp_end }}"
+        ip_version: "4"
+        dns_nameservers: "{{ default_nameservers }}"
 
-
-
-
+    - name: Create router
+      os_router:
+        state: present
+        name: "{{ router_name }}"
+        network: "{{ public_net_name }}"
+        interfaces:
+          - "{{ subnet_name }}"
 
     - name: Output security groups
       debug:
