@@ -120,18 +120,23 @@
       loop: "{{ launch.results }}"
       when: item.openstack.name in groups.loadbalancer
 
-    # ADD SSH args 
+    # ADD SSH args
+    - name: Set ssh args for bastion
+      add_host:
+        name: "{{ item.openstack.name }}"
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o ForwardAgent=yes"
+      loop: "{{ launch.results }}"
+      when: item.openstack.name in groups.bastion
 
-
-
-
-
-
-
-
-
-
-
+    - name: Set ssh args for rest of cluster
+      add_host:
+        name: "{{ item.openstack.name }}"
+        ansible_ssh_common_args: >
+          -o StrictHostKeyChecking=no
+          -o ForwardAgent=yes
+          -o ProxyCommand='ssh {{ hostvars[item.openstack.name].ansible_user }}@{{ hostvars[groups.bastion[0]].ansible_host }} exec nc -w300 %h %p'
+      loop: "{{ launch.results }}"
+      when: item.openstack.name in groups.private_net
 
     - name: Remove IP from all machines from known hosts
       known_hosts:
