@@ -8,7 +8,8 @@
     host_set: "{{ groups.cluster }}"
     
     # ADD extract security groups from inventory
-
+    security_groups: "{{ host_set | map('extract', hostvars, 'security_groups') | sum(start=[]) | list | unique }}"
+    security_group_names: "{{ security_groups | map(attribute='group') | list | unique }}"
 
   tasks:
 
