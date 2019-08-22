@@ -5,6 +5,7 @@
   gather_facts: false
   vars:
     # ADD hosts to create
+    host_set: "{{ groups.cluster }}"
     
     # ADD extract security groups from inventory
 
