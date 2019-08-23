@@ -20,16 +20,18 @@
   tasks:
 
     # ADD disable application at lb
-
-
-
-
+    - name: Disable application at load balancer
+      haproxy:
+        backend: catapp-backend
+        host: "{{ web_server }}"
+        state: disabled
+      delegate_to: "{{ item }}"
+      loop: "{{ groups.loadbalancer }}"
 
     - import_tasks: tasks/setup-app.yml
 
     # ADD flush handlers
     - meta: flush_handlers
-
 
     # ADD wait for 5000
     - name: Make sure gunicorn is accepting connections
@@ -37,11 +39,14 @@
         port: 5000
         timeout: 60
 
-
     # ADD enable application at lb
-
-
-
+    - name: Re-enable application at load balancer
+      haproxy:
+        backend: catapp-backend
+        host: "{{ web_server }}"
+        state: enabled
+      delegate_to: "{{ item }}"
+      loop: "{{ groups.loadbalancer }}"
 
   handlers:
     - name: restart gunicorn
