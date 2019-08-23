@@ -49,7 +49,16 @@
         timeout: 60
 
     # ADD check version display
-
+    - name: Check that the site is reachable via nginx
+      uri:
+        url: "http://{{ ansible_host }}:5000"
+        status_code: 200
+        return_content: yes
+        headers:
+          HOST: "{{ hostvars[groups.loadbalancer[0]].openstack.public_v4 }}.xip.io"
+      register: app_site
+      failed_when: "'version: ' + app_version not in app_site.content"
+      delegate_to: "{{ web_server }}"
 
 
   handlers:
